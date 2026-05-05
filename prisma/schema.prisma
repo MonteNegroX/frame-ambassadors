@@ -1,0 +1,232 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPERADMIN
+  PROJECT
+  KOL
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  IN_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum PaymentType {
+  INSTANT
+  SABLIER_STREAM
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id              String      @id @default(uuid())
+  role            UserRole    @default(KOL)
+  twitterId       String?     @unique @map("twitter_id")
+  twitterHandle   String?     @unique @map("twitter_handle")
+  walletAddress   String?     @unique @map("wallet_address")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Referral Fields
+  referralCode    String?     @unique @map("referral_code")
+  referredById    String?     @map("referred_by_id")
+  referredBy      User?       @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals       User[]      @relation("UserReferrals")
+  
+  points          Int         @default(0)
+  xpPoints        Int         @default(0) @map("xp_points")
+  waitlistRank    Int?        @map("waitlist_rank")
+
+  // Scoring & Multipliers
+  multiplier      Float       @default(1.05)
+  ethosScore      Int?        @default(0) @map("ethos_score")
+  ethosAvatarUrl  String?     @map("ethos_avatar_url")
+  ethosDisplayName String?    @map("ethos_display_name")
+  
+  sorsaScore      Int?        @default(0) @map("sorsa_score")
+  frameScore      Float?      @map("frame_score")
+
+  // Social Tasks
+  followedTwitter Boolean     @default(false) @map("followed_twitter")
+  postedTweet     Boolean     @default(false) @map("posted_tweet")
+  tweetId         String?     @map("tweet_id")
+
+  // Relations
+  project         Project?
+  kolProfile      KOLProfile?
+
+  @@map("users")
+}
+
+model Project {
+  id              String      @id @map("user_id")
+  name            String
+  description     String?
+  website         String?
+  logoUrl         String?     @map("logo_url")
+  verified        Boolean     @default(false)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user            User        @relation(fields: [id], references: [id], onDelete: Cascade)
+  campaigns       Campaign[]
+
+  @@map("projects")
+}
+
+model KOLProfile {
+  id                      String      @id @map("user_id")
+  followerCount           Int?        @map("follower_count")
+  niches                  String[]
+  avgEngagementRate       Float?      @map("avg_engagement_rate")
+  completedCampaignsCount Int         @default(0) @map("completed_campaigns_count")
+  rating                  Float?
+  
+  // Scoring Fields
+  socialScore             Int?        @map("social_score")
+  scoutScore              Int?        @map("scout_score")
+  lastScoredAt            DateTime?   @map("last_scored_at")
+
+  createdAt               DateTime    @default(now()) @map("created_at")
+  updatedAt               DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user            User                  @relation(fields: [id], references: [id], onDelete: Cascade)
+  applications    CampaignApplication[]
+  submissions     ContentSubmission[]
+  payments        Payment[]
+
+  @@map("kol_profiles")
+}
+
+model Campaign {
+  id              String          @id @default(uuid())
+  projectId       String          @map("project_id")
+  title           String
+  brief           String          @db.Text
+  contentType     String          @map("content_type") // thread, tweet, video, article
+  platform        String          @default("twitter")
+  budgetUsd       Decimal         @map("budget_usd") @db.Decimal(10, 2)
+  tokenAddress    String?         @map("token_address")
+  paymentType     PaymentType     @default(INSTANT) @map("payment_type")
+  vestingConfig   Json?           @map("vesting_config") // { cliffDays: number, durationDays: number }
+  status          CampaignStatus  @default(DRAFT)
+  deadline        DateTime
+  type            String          @default("open") // open, invite
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  project         Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  applications    CampaignApplication[]
+  submissions     ContentSubmission[]
+  payments        Payment[]
+  escrowDeposit   EscrowDeposit?
+
+  @@map("campaigns")
+}
+
+model CampaignApplication {
+  id              String            @id @default(uuid())
+  campaignId      String            @map("campaign_id")
+  kolId           String            @map("kol_id")
+  pitch           String?           @db.Text
+  status          ApplicationStatus @default(PENDING)
+  appliedAt       DateTime          @default(now()) @map("applied_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  campaign        Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  kol             KOLProfile        @relation(fields: [kolId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, kolId])
+  @@map("campaign_applications")
+}
+
+model ContentSubmission {
+  id              String            @id @default(uuid())
+  campaignId      String            @map("campaign_id")
+  kolId           String            @map("kol_id")
+  postUrl         String            @map("post_url")
+  postIdTwitter   String?           @map("post_id_twitter")
+  views           Int?              @default(0)
+  engagement      Int?              @default(0)
+  status          SubmissionStatus  @default(SUBMITTED)
+  reviewerNote    String?           @map("reviewer_note") @db.Text
+  submittedAt     DateTime          @default(now()) @map("submitted_at")
+  reviewedAt      DateTime?         @map("reviewed_at")
+
+  // Relations
+  campaign        Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  kol             KOLProfile        @relation(fields: [kolId], references: [id], onDelete: Cascade)
+
+  @@map("content_submissions")
+}
+
+model Payment {
+  id              String            @id @default(uuid())
+  campaignId      String            @map("campaign_id")
+  kolId           String            @map("kol_id")
+  amount          Decimal           @db.Decimal(18, 8)
+  token           String
+  txHash          String?           @map("tx_hash")
+  type            PaymentType       @map("type")
+  streamId        String?           @map("stream_id")
+  status          TransactionStatus @default(PENDING)
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  campaign        Campaign          @relation(fields: [campaignId], references: [id])
+  kol             KOLProfile        @relation(fields: [kolId], references: [id])
+
+  @@map("payments")
+}
+
+model EscrowDeposit {
+  id              String            @id @default(uuid())
+  campaignId      String            @unique @map("campaign_id")
+  contractAddress String            @map("contract_address")
+  amount          Decimal           @db.Decimal(18, 8)
+  token           String
+  txHash          String?           @map("tx_hash")
+  chainId         Int               @map("chain_id")
+  status          TransactionStatus @default(PENDING)
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  campaign        Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@map("escrow_deposits")
+}
