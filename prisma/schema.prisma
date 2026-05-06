@@ -77,6 +77,10 @@ model User {
   sorsaScore      Int?        @default(0) @map("sorsa_score")
   frameScore      Float?      @map("frame_score")
 
+  // Moni Smart Status
+  moniSmartTier      Int?        @map("moni_smart_tier")
+  moniSmartFollowers Int?        @map("moni_smart_followers")
+
   // Social Tasks
   followedTwitter Boolean     @default(false) @map("followed_twitter")
   postedTweet     Boolean     @default(false) @map("posted_tweet")
