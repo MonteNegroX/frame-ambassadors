@@ -293,6 +293,7 @@ export async function getLeaderboardAction(limit: number = 10) {
         points: true,
         ethosAvatarUrl: true,
         tweetId: true,
+        moniSmartTier: true,
       },
     });
     return { success: true, topUsers };

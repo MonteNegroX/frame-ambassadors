@@ -11,6 +11,7 @@ interface TopUser {
   points: number;
   ethosAvatarUrl?: string | null;
   tweetId?: string | null;
+  moniSmartTier?: number | null;
 }
 
 interface PublicLeaderboardProps {
@@ -120,10 +121,15 @@ export function PublicLeaderboard({ limit = 10 }: PublicLeaderboardProps) {
                 {/* Content */}
                 <div className="flex-1">
                   <h3 className={cn(
-                    "text-lg font-bold tracking-tight mb-0.5 transition-colors group-hover/link:text-yellow-500 truncate",
+                    "text-lg font-bold tracking-tight mb-0.5 transition-colors group-hover/link:text-yellow-500 truncate flex items-center gap-2",
                     index === 0 ? "text-yellow-400" : "text-white"
                   )}>
-                    @{user.twitterHandle || "Anonymous"}
+                    <span>@{user.twitterHandle || "Anonymous"}</span>
+                    {user.moniSmartTier && user.moniSmartTier > 0 && user.moniSmartTier <= 3 && (
+                      <span className="text-sm" title={`Moni Smart Tier ${user.moniSmartTier}`}>
+                        {"🧠".repeat(4 - user.moniSmartTier)}
+                      </span>
+                    )}
                   </h3>
                   <p className="text-white/40 text-sm font-mono uppercase tracking-widest">
                     {user.points.toLocaleString()} <span className="opacity-50">XP</span>
