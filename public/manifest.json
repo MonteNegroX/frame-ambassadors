@@ -1,7 +1,7 @@
 {
-  "name": "Ambassador Waitlist",
-  "short_name": "Waitlist",
-  "description": "Join the FRAME OS Ambassador Program",
+  "name": "FRAME | Waitlist",
+  "short_name": "FRAME | Waitlist",
+  "description": "Join the FRAME Waitlist",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

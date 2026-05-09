@@ -428,11 +428,29 @@ export function Terminal({
     </span>
   );
 
+  const skipAnimation = () => {
+    if (phase === "done" || phase === "idle") return;
+
+    const allLines: TerminalLine[] = [];
+    commands.forEach((cmd, idx) => {
+      allLines.push({ type: "command", content: cmd });
+      const cmdOutputs = outputs[idx] || [];
+      cmdOutputs.forEach((out) => {
+        allLines.push({ type: "output", content: out });
+      });
+    });
+
+    setLines(allLines);
+    setCurrentText("");
+    setPhase("done");
+  };
+
   return (
     <div
       ref={containerRef}
+      onClick={skipAnimation}
       className={cn(
-        "mx-auto w-full max-w-xl px-4 font-mono text-xs",
+        "mx-auto w-full max-w-xl px-4 font-mono text-xs cursor-pointer",
         className,
       )}
     >
