@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.frameonx.waitlist.twa",
+      "sha256_cert_fingerprints": [
+        "73:4C:F6:27:DC:5B:58:D9:EF:B9:A8:D8:8D:80:36:11:F8:29:0E:04:91:43:53:CA:2C:3B:4C:79:84:97:58:39"
+      ]
+    }
+  }
+]
