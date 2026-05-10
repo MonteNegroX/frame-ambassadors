@@ -7,9 +7,9 @@ import { Home, LayoutDashboard, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { name: "Главная", href: "/", icon: Home },
-  { name: "Дашборд", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Рейтинг", href: "/leaderboard", icon: Trophy },
+  { name: "Home", href: "/", icon: Home },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
   {
     name: "X",
     href: "https://x.com/frameonx",
