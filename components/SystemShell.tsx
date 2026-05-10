@@ -3,6 +3,7 @@
 import { useSystem } from "@/components/providers/SystemProvider";
 import { Nav } from "@/components/Nav";
 import { WaitlistDock } from "@/components/WaitlistDock";
+import { MobileNav } from "@/components/navigation/MobileNav";
 import { BentoWindow } from "@/components/BentoWindow";
 import { PublicLeaderboard } from "@/components/PublicLeaderboard";
 import AnimatedGradient from "@/components/animated-gradient";
@@ -15,6 +16,7 @@ export function SystemShell({ children }: { children: React.ReactNode }) {
       {/* Persistent OS UI elements */}
       
       <WaitlistDock />
+      <MobileNav />
 
       {/* Ultra-premium Animated Background */}
       <div className="fixed inset-0 z-0 overflow-hidden bg-black pointer-events-none">
