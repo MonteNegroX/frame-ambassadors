@@ -8,7 +8,7 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 ## Features
 
 - **Privy Auth** — Twitter/X OAuth login with embedded Solana wallet creation
-- **Social Tasks** — Follow @frameonx, quote a target tweet → verified via Composio/Twitter API → points awarded
+- **Social Tasks** — Follow @frameonx, quote a target tweet → **Local AI Verification (QVAC)** → points awarded
 - **Referral System** — Unique referral link per user; referrals add bonus points
 - **Leaderboard** — Real-time ranking with Frame Score, regional breakdown
 - **Identity Card** — Personalized 1200×630px OG image generated per user (`/api/og`)
@@ -22,16 +22,26 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 | Auth | Privy (`@privy-io/react-auth`, `@privy-io/server-auth`) |
 | Database | Supabase PostgreSQL via Prisma ORM + `pg` pool |
 | OG Images | `@vercel/og` (Satori) with IBMPlexMono font |
-| Social Verification | Composio API → Twitter API v2 |
+| AI Oracle | **QVAC Local AI** (Qwen3-600M LLM via @qvac/sdk) |
 | Hosting | Vercel |
 
 ## Local Development
 
-```bash
-cd waitlist
-npm install
-npm run dev
-```
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Start the AI Verification Server:**
+   ```bash
+   node qvac-server.mjs
+   ```
+   *Wait for `✅ Model ready!` (requires ~1GB free RAM).*
+
+3. **Start the Next.js app:**
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
@@ -42,23 +52,23 @@ NEXT_PUBLIC_PRIVY_APP_ID=
 PRIVY_APP_SECRET=
 DATABASE_URL=
 DIRECT_URL=
-COMPOSIO_API_KEY=
-COMPOSIO_ENTITY_ID=
-COMPOSIO_CONNECTION_ID=
+NEXT_PUBLIC_QVAC_URL=http://localhost:3001
 ```
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
+| `qvac-server.mjs` | **Local AI Inference Server** (handles tweet moderation) |
+| `app/api/qvac/verify/route.ts` | AI moderation proxy + tweet scraper |
 | `app/page.tsx` | Landing + waitlist entry (LandingContent) |
 | `app/dashboard/page.tsx` | User dashboard (BentoDashboard) |
 | `app/leaderboard/page.tsx` | Full leaderboard |
 | `app/api/og/route.tsx` | Identity Card OG image generation |
 | `lib/auth.ts` | Privy server-side session verification |
 | `lib/prisma.ts` | Prisma + pg.Pool adapter |
-| `lib/actions/user.ts` | Server actions: sync user, verify tasks, award points |
-| `components/BentoDashboard.tsx` | Main dashboard bento grid |
+| `lib/actions/user.ts` | Server actions: award points after AI verification |
+| `components/BentoDashboard.tsx` | Main dashboard with social task buttons |
 | `components/ShareImageModal.tsx` | Copy-to-clipboard + tweet share modal |
 
 ## Administration Utilities

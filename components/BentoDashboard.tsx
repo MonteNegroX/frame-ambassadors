@@ -11,12 +11,15 @@ import {
   Users,
   Sparkles,
   Lock,
-  Loader2
+  Loader2,
+  BrainCircuit,
+  Link2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { CountUp } from "@/components/unlumen-ui/components/effects/count-up";
 import { ShareImageModal } from "./ShareImageModal";
+import { QvacBadge } from "./QvacBadge";
 
 interface BentoDashboardProps {
   dbUser: any;
@@ -31,6 +34,16 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
   const [postClicked, setPostClicked] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [verifying, setVerifying] = useState<"follow" | "post" | null>(null);
+
+  // QVAC AI verification state
+  const [tweetUrl, setTweetUrl] = useState("");
+  const [aiChecking, setAiChecking] = useState(false);
+  const [aiResult, setAiResult] = useState<{
+    isValid: boolean;
+    reason: string;
+    confidence: number;
+    tweetText?: string;
+  } | null>(null);
 
   const handleFollow = () => {
     window.open("https://x.com/frameonx", "_blank");
@@ -50,12 +63,29 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
     setPostClicked(true);
   };
 
-  const handlePostCheck = () => {
-    setVerifying("post");
-    setTimeout(() => {
-      onTask("post");
-      setVerifying(null);
-    }, 2000);
+  // QVAC AI verification handler
+  const handleAiVerify = async () => {
+    const isValidUrl =
+      tweetUrl.includes("x.com") || tweetUrl.includes("twitter.com");
+    if (!isValidUrl) return;
+    setAiChecking(true);
+    setAiResult(null);
+    try {
+      const res = await fetch("/api/qvac/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tweetUrl }),
+      });
+      const result = await res.json();
+      setAiResult(result);
+      if (result.isValid) {
+        setTimeout(() => onTask("post"), 1000);
+      }
+    } catch {
+      setAiResult({ isValid: false, reason: "Network error. Try again.", confidence: 0 });
+    } finally {
+      setAiChecking(false);
+    }
   };
 
   const handlePreview = () => {
@@ -130,9 +160,9 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-0 border border-dashed border-yellow-500/20 rounded-full"
                 />
-                <Zap className="h-6 w-6 text-yellow-500/40 animate-pulse" />
+                <Zap className="h-6 w-6 text-yellow-500/40" />
               </div>
-              <div className="text-[10px] font-mono tracking-[0.3em] uppercase opacity-40 animate-pulse">Initializing...</div>
+              <div className="text-[10px] font-mono tracking-[0.3em] uppercase opacity-40">Awaiting Data...</div>
             </div>
           ) : (
             <>
@@ -233,34 +263,76 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
                 </div>
                 <span className="text-yellow-500">+100 XP</span>
               </div>
-              {(!dbUser?.frameScore || dbUser?.frameScore === 0) ? (
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-black/40 border border-white/5 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 cursor-not-allowed"
-                >
-                  <Lock className="h-3 w-3" />
-                  REQUIRES FRAME SCORE
-                </button>
-              ) : dbUser?.postedTweet ? (
+              {dbUser?.postedTweet ? (
                 <div className="w-full flex items-center justify-center gap-2 rounded-lg bg-white/5 border border-white/10 py-2.5 text-[9px] font-bold text-white/40 uppercase tracking-[0.2em]">
                   <CheckCircle2 className="h-3.5 w-3.5 text-green-500/50" />
                   TWEET VERIFIED
                 </div>
               ) : postClicked ? (
-                <button
-                  disabled={verifying === "post"}
-                  onClick={handlePostCheck}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-yellow-500 text-black py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-yellow-400 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)] animate-pulse disabled:opacity-70 disabled:animate-none"
-                >
-                  {verifying === "post" ? (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      VERIFYING DATA...
-                    </>
-                  ) : (
-                    "CONFIRM TWEET"
+                <div className="flex flex-col gap-2 w-full">
+                  {/* URL input */}
+                  <div className="relative">
+                    <Link2 className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/30" />
+                    <input
+                      type="url"
+                      value={tweetUrl}
+                      onChange={(e) => { setTweetUrl(e.target.value); setAiResult(null); }}
+                      placeholder="https://x.com/you/status/..."
+                      className="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-[10px] font-mono text-white/70 placeholder:text-white/20 focus:outline-none focus:border-yellow-500/40 transition-colors"
+                    />
+                  </div>
+
+                  {/* AI Verify button */}
+                  <button
+                    disabled={aiChecking || (!tweetUrl.includes("x.com") && !tweetUrl.includes("twitter.com"))}
+                    onClick={handleAiVerify}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-yellow-500 text-black py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-yellow-400 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                  >
+                    {aiChecking ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        ANALYZING LOCALLY...
+                      </>
+                    ) : (
+                      <>
+                        <BrainCircuit className="h-3 w-3" />
+                        ⚡ AI VERIFY
+                      </>
+                    )}
+                  </button>
+
+                  {/* AI Result */}
+                  {aiResult && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex flex-col gap-1.5 rounded-lg p-2.5 border ${
+                        aiResult.isValid
+                          ? "bg-green-500/5 border-green-500/20"
+                          : "bg-red-500/5 border-red-500/20"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {aiResult.isValid ? (
+                          <CheckCircle2 className="h-3 w-3 text-green-400 flex-shrink-0" />
+                        ) : (
+                          <X className="h-3 w-3 text-red-400 flex-shrink-0" />
+                        )}
+                        <span className={`text-[10px] font-bold ${
+                          aiResult.isValid ? "text-green-400" : "text-red-400"
+                        }`}>
+                          {aiResult.isValid ? "VERIFIED" : "REJECTED"}
+                          {aiResult.confidence > 0 && ` · ${Math.round(aiResult.confidence * 100)}%`}
+                        </span>
+                      </div>
+                      <p className="text-[9px] text-white/40 leading-relaxed">{aiResult.reason}</p>
+                      {aiResult.tweetText && (
+                        <p className="text-[9px] text-white/20 italic truncate">"{aiResult.tweetText.slice(0, 80)}"</p>
+                      )}
+                      <QvacBadge />
+                    </motion.div>
                   )}
-                </button>
+                </div>
               ) : (
                 <button
                   onClick={handlePost}
