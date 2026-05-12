@@ -4,6 +4,7 @@ import prisma from "../prisma";
 import { PrivyClient } from "@privy-io/server-auth";
 import { cookies } from "next/headers";
 import { getEthosUserByX, calculateMultiplier } from "../ethos";
+import { unstable_cache } from "next/cache";
 
 const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "";
 const PRIVY_APP_SECRET = process.env.PRIVY_APP_SECRET || "";
@@ -195,66 +196,50 @@ export async function syncUserAction() {
 }
 
 export async function getGlobalStatsAction() {
-  try {
-    const totalUsers = await prisma.user.count();
-    const globalSum = await prisma.user.aggregate({
-      _sum: {
-        points: true
-      }
-    });
-
-    const avgEthosData = await prisma.user.aggregate({
-      where: {
-        ethosScore: { gt: 0 }
-      },
-      _avg: {
-        ethosScore: true
-      }
-    });
-
-    const avgSorsaData = await prisma.user.aggregate({
-      where: {
-        sorsaScore: { gt: 0 }
-      },
-      _avg: {
-        sorsaScore: true
-      }
-    });
-
-    const avgFrameData = await prisma.user.aggregate({
-      where: {
-        frameScore: { gt: 0 }
-      },
-      _avg: {
-        frameScore: true
-      }
-    });
-
-    const totalReferrals = await prisma.user.count({
-      where: {
-        referredById: { not: null }
-      }
-    });
-
-    return { 
-      success: true, 
-      stats: {
-        totalUsers: totalUsers || 0,
-        totalPoints: globalSum._sum.points || 0,
-        totalReferrals: totalReferrals || 0,
-        avgEthos: Math.round(avgEthosData._avg.ethosScore || 0),
-        avgSorsa: Math.round(avgSorsaData._avg.sorsaScore || 0),
-        avgFrameScore: Math.round(avgFrameData._avg.frameScore || 0),
-        networkStatus: "Synchronized",
-        version: "1.0 Alpha",
-        payoutsHandled: "$2.4M"
-      }
-    };
-  } catch (error) {
-    console.error("❌ [Stats Error]:", error);
-    return { success: false };
-  }
+  return getCachedGlobalStats();
 }
+
+const getCachedGlobalStats = unstable_cache(
+  async () => {
+    try {
+      const [
+        totalUsers,
+        globalSum,
+        avgEthosData,
+        avgSorsaData,
+        avgFrameData,
+        totalReferrals,
+      ] = await Promise.all([
+        prisma.user.count(),
+        prisma.user.aggregate({ _sum: { points: true } }),
+        prisma.user.aggregate({ where: { ethosScore: { gt: 0 } }, _avg: { ethosScore: true } }),
+        prisma.user.aggregate({ where: { sorsaScore: { gt: 0 } }, _avg: { sorsaScore: true } }),
+        prisma.user.aggregate({ where: { frameScore: { gt: 0 } }, _avg: { frameScore: true } }),
+        prisma.user.count({ where: { referredById: { not: null } } }),
+      ]);
+
+      return {
+        success: true,
+        stats: {
+          totalUsers: totalUsers || 0,
+          totalPoints: globalSum._sum.points || 0,
+          totalReferrals: totalReferrals || 0,
+          avgEthos: Math.round(avgEthosData._avg.ethosScore || 0),
+          avgSorsa: Math.round(avgSorsaData._avg.sorsaScore || 0),
+          avgFrameScore: Math.round(avgFrameData._avg.frameScore || 0),
+          networkStatus: "Synchronized",
+          version: "1.0 Alpha",
+          payoutsHandled: "$2.4M",
+        },
+      };
+    } catch (error) {
+      console.error("❌ [Stats Error]:", error);
+      return { success: false };
+    }
+  },
+  ["global-stats"],       // cache key
+  { revalidate: 60 }      // обновляется раз в 60 секунд
+);
 
 export async function getRecentUsersAction() {
   try {
