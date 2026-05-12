@@ -9,6 +9,7 @@ import { PublicLeaderboard } from "@/components/PublicLeaderboard";
 import AnimatedGradient from "@/components/animated-gradient";
 import { RecentSignups } from "@/components/RecentSignups";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export function SystemShell({ children }: { children: React.ReactNode }) {
   return (
@@ -47,6 +48,12 @@ export function SystemShell({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 relative z-10 pt-32 pb-24">
         {children}
+        <footer className="mt-20 py-8 border-t border-white/5 text-center">
+          <div className="flex justify-center gap-6 text-[10px] uppercase tracking-widest text-white/30 font-mono">
+            <Link href="/terms" className="hover:text-yellow-500 transition-colors">Terms of Use</Link>
+            <Link href="/privacy" className="hover:text-yellow-500 transition-colors">Privacy Policy</Link>
+          </div>
+        </footer>
       </main>
 
       <RecentSignups />
