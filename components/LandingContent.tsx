@@ -27,13 +27,13 @@ function ReferralTracker() {
 
 export function LandingContent() {
   const { globalStats } = useSystem();
-  const [isBooting, setIsBooting] = useState(true);
+  // const [isBooting, setIsBooting] = useState(true);
 
-  useEffect(() => {
-    if (localStorage.getItem("frame-os-booted")) {
-      setIsBooting(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem("frame-os-booted")) {
+  //     setIsBooting(false);
+  //   }
+  // }, []);
 
   return (
     <LayoutGroup>
@@ -41,6 +41,7 @@ export function LandingContent() {
         <ReferralTracker />
       </Suspense>
 
+      {/* WaitlistLoader временно отключён
       <AnimatePresence>
         {isBooting && (
           <WaitlistLoader onComplete={() => {
@@ -49,11 +50,12 @@ export function LandingContent() {
           }} />
         )}
       </AnimatePresence>
+      */}
 
       <motion.div
         className="space-y-16"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: isBooting ? 0 : 1, y: isBooting ? 20 : 0 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div id="landing-bento" className="w-full">
