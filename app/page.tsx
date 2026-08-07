@@ -5,6 +5,13 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
+export const metadata: Metadata = {
+  // ... existing metadata
+  other: {
+    'virtual-protocol-site-verification': '4ea274af2f4209ca6927953a837d1183',
+  },
+}
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
   const ref = params.ref as string;
