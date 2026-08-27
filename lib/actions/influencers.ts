@@ -56,8 +56,9 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
   const skip = (page - 1) * limit;
 
   try {
-    // Build where clause for User — match all users with registered twitter handle
+    // Build where clause for User — match users with role=KOL and registered twitter handle
     const userWhere: any = {
+      role: "KOL",
       twitterHandle: { not: null },
     };
 
