@@ -36,8 +36,18 @@ function MoniSmartBadge({ tier }: { tier: number }) {
 }
 
 export function InfluencerCard({ influencer, index = 0, onSendOffer }: InfluencerCardProps) {
-  const { twitterHandle, displayName, avatarUrl, csScore, followerCount, isPremium, moniSmartTier, prices } =
-    influencer;
+  const {
+    twitterHandle,
+    displayName,
+    avatarUrl,
+    csScore,
+    frameScore,
+    waitlistRank,
+    followerCount,
+    isPremium,
+    moniSmartTier,
+    prices,
+  } = influencer;
 
   const handle = twitterHandle ? `@${twitterHandle}` : "@unknown";
 
@@ -61,48 +71,65 @@ export function InfluencerCard({ influencer, index = 0, onSendOffer }: Influence
 
       {/* Card body */}
       <div className="flex flex-col gap-3 p-4 flex-1">
-        {/* Header: Avatar + Handle */}
-        <div className="flex items-center gap-3">
-          <div className={cn(
-            "w-11 h-11 rounded-full border overflow-hidden flex-shrink-0 flex items-center justify-center bg-neutral-900",
-            "border-white/10 group-hover:border-yellow-500/40 transition-colors"
-          )}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={handle} className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-5 h-5 text-white/30" />
-            )}
+        {/* Header: Avatar + Handle + Rank Badge */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={cn(
+              "w-11 h-11 rounded-full border overflow-hidden flex-shrink-0 flex items-center justify-center bg-neutral-900",
+              "border-white/10 group-hover:border-yellow-500/40 transition-colors"
+            )}>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={handle} className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5 text-white/30" />
+              )}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <a
+                href={`https://x.com/${twitterHandle ?? ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-bold tracking-tight text-white truncate hover:text-yellow-400 transition-colors"
+              >
+                {handle}
+              </a>
+              {displayName && (
+                <span className="text-[10px] text-white/30 truncate font-mono">{displayName}</span>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col min-w-0">
-            <a
-              href={`https://x.com/${twitterHandle ?? ""}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-bold tracking-tight text-white truncate hover:text-yellow-400 transition-colors"
-            >
-              {handle}
-            </a>
-            {displayName && (
-              <span className="text-[10px] text-white/30 truncate font-mono">{displayName}</span>
-            )}
-          </div>
+
+          {/* System Rank Badge */}
+          {waitlistRank && (
+            <span className="flex-shrink-0 px-2 py-0.5 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 font-mono font-bold text-[10px] tabular-nums">
+              #{waitlistRank}
+            </span>
+          )}
         </div>
 
-        {/* Metrics Row: CS + Followers */}
-        <div className="grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-white/[0.03] border border-white/5 overflow-hidden">
-          <div className="flex flex-col items-center py-2.5 px-2">
-            <span className="text-xl font-bold tabular-nums text-yellow-400">
+        {/* Metrics Row: CS + Frame Score + Followers */}
+        <div className="grid grid-cols-3 divide-x divide-white/5 rounded-xl bg-white/[0.03] border border-white/5 overflow-hidden">
+          <div className="flex flex-col items-center py-2.5 px-1">
+            <span className="text-lg font-bold tabular-nums text-yellow-400">
               {csScore.toLocaleString()}
             </span>
-            <span className="text-[9px] uppercase tracking-[0.2em] text-white/30 mt-0.5 font-mono flex items-center gap-1">
-              CS <span className="opacity-50">ⓘ</span>
+            <span className="text-[8px] uppercase tracking-[0.15em] text-white/30 mt-0.5 font-mono">
+              CS
             </span>
           </div>
-          <div className="flex flex-col items-center py-2.5 px-2">
-            <span className="text-xl font-bold tabular-nums text-white">
+          <div className="flex flex-col items-center py-2.5 px-1">
+            <span className="text-lg font-bold tabular-nums text-white">
+              {frameScore.toLocaleString()}
+            </span>
+            <span className="text-[8px] uppercase tracking-[0.15em] text-white/30 mt-0.5 font-mono">
+              FS ⚡
+            </span>
+          </div>
+          <div className="flex flex-col items-center py-2.5 px-1">
+            <span className="text-lg font-bold tabular-nums text-white">
               {formatFollowers(followerCount)}
             </span>
-            <span className="text-[9px] uppercase tracking-[0.2em] text-white/30 mt-0.5 font-mono">
+            <span className="text-[8px] uppercase tracking-[0.15em] text-white/30 mt-0.5 font-mono">
               Followers
             </span>
           </div>

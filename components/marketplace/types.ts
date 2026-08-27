@@ -6,6 +6,8 @@ export interface InfluencerData {
   displayName: string | null;
   avatarUrl: string | null;
   csScore: number;
+  frameScore: number;
+  waitlistRank: number | null;
   followerCount: number;
   moniSmartTier: number | null;
   isPremium: boolean;
