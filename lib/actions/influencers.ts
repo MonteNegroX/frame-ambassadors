@@ -56,53 +56,57 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
   const skip = (page - 1) * limit;
 
   try {
-    // Build where clause for User
+    // Build where clause for User — match all users with registered twitter handle
     const userWhere: any = {
-      role: "KOL",
       twitterHandle: { not: null },
     };
 
     if (search) {
       userWhere.twitterHandle = {
-        contains: search.replace("@", ""),
+        contains: search.replace("@", "").trim(),
         mode: "insensitive",
       };
     }
 
     // CS = sorsaScore on User level
-    if (minCs !== undefined || maxCs !== undefined) {
-      userWhere.sorsaScore = {};
-      if (minCs !== undefined) userWhere.sorsaScore.gte = minCs;
-      if (maxCs !== undefined) userWhere.sorsaScore.lte = maxCs;
+    if (minCs !== undefined && !isNaN(minCs)) {
+      userWhere.sorsaScore = { ...(userWhere.sorsaScore || {}), gte: minCs };
+    }
+    if (maxCs !== undefined && !isNaN(maxCs)) {
+      userWhere.sorsaScore = { ...(userWhere.sorsaScore || {}), lte: maxCs };
     }
 
     if (isPremium) {
       userWhere.moniSmartTier = { not: null, lte: 3 };
     }
 
-    // Follower filter sits on KOLProfile
-    const kolProfileWhere: any = {};
-    if (minFollowers !== undefined || maxFollowers !== undefined) {
-      kolProfileWhere.followerCount = {};
-      if (minFollowers !== undefined)
-        kolProfileWhere.followerCount.gte = minFollowers;
-      if (maxFollowers !== undefined)
-        kolProfileWhere.followerCount.lte = maxFollowers;
+    // Follower filter — check moniSmartFollowers on User level or kolProfile
+    if (minFollowers !== undefined && !isNaN(minFollowers)) {
+      userWhere.OR = [
+        { moniSmartFollowers: { gte: minFollowers } },
+        { kolProfile: { followerCount: { gte: minFollowers } } },
+      ];
+    }
+    if (maxFollowers !== undefined && !isNaN(maxFollowers)) {
+      userWhere.AND = [
+        ...(userWhere.AND || []),
+        {
+          OR: [
+            { moniSmartFollowers: { lte: maxFollowers } },
+            { kolProfile: { followerCount: { lte: maxFollowers } } },
+          ],
+        },
+      ];
     }
 
-    const hasKolProfileFilter = Object.keys(kolProfileWhere).length > 0;
-    if (hasKolProfileFilter) {
-      userWhere.kolProfile = { is: kolProfileWhere };
-    }
-
-    // Build orderBy
+    // Build orderBy (use moniSmartFollowers for followers sort)
     const orderByMap: Record<string, any> = {
-      sorsaScore: { sorsaScore: sortDir },
+      sorsaScore: [{ sorsaScore: sortDir }, { points: sortDir }],
       points: { points: sortDir },
       createdAt: { createdAt: sortDir },
-      followers: { kolProfile: { followerCount: sortDir } },
+      followers: [{ moniSmartFollowers: sortDir }, { points: sortDir }],
     };
-    const orderBy = orderByMap[sortBy] ?? { sorsaScore: "desc" };
+    const orderBy = orderByMap[sortBy] ?? [{ sorsaScore: "desc" }, { points: "desc" }];
 
     const [total, users] = await Promise.all([
       prisma.user.count({ where: userWhere }),
