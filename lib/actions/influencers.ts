@@ -39,6 +39,16 @@ function calcEstimatedPrices(
   };
 }
 
+function formatAvatarUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (url.includes("pbs.twimg.com/profile_images/")) {
+    if (!url.match(/_(400x400|normal|bigger|mini)\.[a-z]{3,4}$/i)) {
+      return url.replace(/(\.[a-z]{3,4})$/i, "_400x400$1");
+    }
+  }
+  return url;
+}
+
 export async function getInfluencersAction(filters: InfluencerFilters = {}) {
   const {
     search,
@@ -156,7 +166,7 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
         id: u.id,
         twitterHandle: u.twitterHandle,
         displayName: u.ethosDisplayName,
-        avatarUrl: u.ethosAvatarUrl,
+        avatarUrl: formatAvatarUrl(u.ethosAvatarUrl),
         csScore: cs,
         frameScore: Math.floor(u.frameScore ?? 0),
         waitlistRank: u.waitlistRank ?? null,
