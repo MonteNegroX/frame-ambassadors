@@ -69,10 +69,10 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
     }
 
     // CS = sorsaScore on User level
-    if (minCs !== undefined && !isNaN(minCs)) {
+    if (minCs !== undefined && !isNaN(minCs) && minCs > 0) {
       userWhere.sorsaScore = { ...(userWhere.sorsaScore || {}), gte: minCs };
     }
-    if (maxCs !== undefined && !isNaN(maxCs)) {
+    if (maxCs !== undefined && !isNaN(maxCs) && maxCs > 0) {
       userWhere.sorsaScore = { ...(userWhere.sorsaScore || {}), lte: maxCs };
     }
 
@@ -81,13 +81,13 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
     }
 
     // Follower filter — check moniSmartFollowers on User level or kolProfile
-    if (minFollowers !== undefined && !isNaN(minFollowers)) {
+    if (minFollowers !== undefined && !isNaN(minFollowers) && minFollowers > 0) {
       userWhere.OR = [
         { moniSmartFollowers: { gte: minFollowers } },
         { kolProfile: { followerCount: { gte: minFollowers } } },
       ];
     }
-    if (maxFollowers !== undefined && !isNaN(maxFollowers)) {
+    if (maxFollowers !== undefined && !isNaN(maxFollowers) && maxFollowers > 0) {
       userWhere.AND = [
         ...(userWhere.AND || []),
         {
