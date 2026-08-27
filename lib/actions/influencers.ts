@@ -41,12 +41,17 @@ function calcEstimatedPrices(
 
 function formatAvatarUrl(url: string | null): string | null {
   if (!url) return null;
-  if (url.includes("pbs.twimg.com/profile_images/")) {
-    if (!url.match(/_(400x400|normal|bigger|mini)\.[a-z]{3,4}$/i)) {
-      return url.replace(/(\.[a-z]{3,4})$/i, "_400x400$1");
+  let formatted = url;
+  if (formatted.includes("pbs.twimg.com/profile_images/")) {
+    if (!formatted.match(/_(400x400|normal|bigger|mini)\.[a-z]{3,4}$/i)) {
+      formatted = formatted.replace(/(\.[a-z]{3,4})$/i, "_400x400$1");
     }
+    return `/api/avatar?url=${encodeURIComponent(formatted)}`;
   }
-  return url;
+  if (formatted.includes("abs.twimg.com/")) {
+    return `/api/avatar?url=${encodeURIComponent(formatted)}`;
+  }
+  return formatted;
 }
 
 export async function getInfluencersAction(filters: InfluencerFilters = {}) {
