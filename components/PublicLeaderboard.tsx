@@ -106,6 +106,7 @@ export function PublicLeaderboard({ limit = 10 }: PublicLeaderboardProps) {
                         src={user.ethosAvatarUrl}
                         alt={user.twitterHandle || "User"}
                         className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
                       />
                     ) : (
                       <User className="w-6 h-6 text-white/40 group-hover/link:text-yellow-500 transition-colors" />

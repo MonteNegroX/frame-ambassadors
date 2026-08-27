@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Zap, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,18 +25,23 @@ function formatPrice(v: number): string {
 }
 
 function MoniSmartBadge({ tier }: { tier: number }) {
-  const brains = "🧠".repeat(Math.max(0, 4 - tier));
   return (
     <span
-      className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-300"
-      title={`Moni Smart Tier ${tier}`}
+      className={cn(
+        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium border",
+        tier === 1 && "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+        tier === 2 && "bg-purple-500/10 text-purple-400 border-purple-500/30",
+        tier >= 3 && "bg-blue-500/10 text-blue-400 border-blue-500/30"
+      )}
     >
-      {brains} Smart
+      <Zap className="w-2.5 h-2.5" />
+      Moni Tier {tier}
     </span>
   );
 }
 
 export function InfluencerCard({ influencer, index = 0, onSendOffer }: InfluencerCardProps) {
+  const [imgError, setImgError] = useState(false);
   const {
     twitterHandle,
     displayName,
@@ -78,8 +84,14 @@ export function InfluencerCard({ influencer, index = 0, onSendOffer }: Influence
               "w-11 h-11 rounded-full border overflow-hidden flex-shrink-0 flex items-center justify-center bg-neutral-900",
               "border-white/10 group-hover:border-yellow-500/40 transition-colors"
             )}>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={handle} className="w-full h-full object-cover" />
+              {avatarUrl && !imgError ? (
+                <img
+                  src={avatarUrl}
+                  alt={handle}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={() => setImgError(true)}
+                />
               ) : (
                 <User className="w-5 h-5 text-white/30" />
               )}
