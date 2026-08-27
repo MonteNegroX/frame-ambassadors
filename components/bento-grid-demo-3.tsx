@@ -192,6 +192,7 @@ const SkeletonFour = () => {
           height="100"
           width="100"
           className="rounded-full h-10 w-10"
+          referrerPolicy="no-referrer"
         />
         <p className="sm:text-sm text-xs text-center font-semibold text-neutral-500 mt-4">
           Just code in Vanilla Javascript
@@ -207,6 +208,7 @@ const SkeletonFour = () => {
           height="100"
           width="100"
           className="rounded-full h-10 w-10"
+          referrerPolicy="no-referrer"
         />
         <p className="sm:text-sm text-xs text-center font-semibold text-neutral-500 mt-4">
           Tailwind CSS is cool, you know
@@ -225,6 +227,7 @@ const SkeletonFour = () => {
           height="100"
           width="100"
           className="rounded-full h-10 w-10"
+          referrerPolicy="no-referrer"
         />
         <p className="sm:text-sm text-xs text-center font-semibold text-neutral-500 mt-4">
           I love angular, RSC, and Redux.

@@ -22,7 +22,7 @@ export default function PrivyClientProvider({
         appearance: {
           theme: "dark",
           accentColor: "#FFD507",
-          logo: "https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg",
+          logo: "/logo.jpg",
           showWalletLoginFirst: false,
         },
         loginMethods: ["twitter"],

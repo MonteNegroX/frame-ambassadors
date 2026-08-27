@@ -41,7 +41,7 @@ export function Nav() {
           <Link href="/" className="flex items-center gap-2 group transition-all">
             <div className="h-8 w-8 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center border border-white/10 group-hover:border-yellow-500/50 transition-colors">
               <img
-                src="https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg"
+                src="/logo.jpg"
                 alt="FRAME OS Logo"
                 className="h-full w-full object-cover"
               />

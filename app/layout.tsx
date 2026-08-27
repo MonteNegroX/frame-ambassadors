@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   description: "Join the Web3 dApp connecting Crypto Projects with KOLs.",
   manifest: "/manifest.json",
   icons: {
-    icon: "https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg",
-    shortcut: "https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg",
-    apple: "https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg",
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
   },
 };
 
