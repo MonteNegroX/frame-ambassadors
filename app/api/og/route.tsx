@@ -201,7 +201,7 @@ export async function GET(request: Request) {
                   {user?.ethosAvatarUrl ? (
                     <img
                       src={user.ethosAvatarUrl}
-                      alt={`${handle} avatar`}
+                      alt={`${ref || "User"} avatar`}
                       style={{
                         width: '100%',
                         height: '100%',
