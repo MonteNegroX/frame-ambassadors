@@ -8,7 +8,7 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 ## Features
 
 - **Privy Auth** — Twitter/X OAuth login with embedded Solana wallet creation
-- **Social Tasks** — Follow @frameonx, quote a target tweet → verified via Composio/Twitter API → points awarded
+- **Social Tasks** — Follow @frameonx, quote a target tweet → **Local AI Verification (QVAC)** → points awarded
 - **Referral System** — Unique referral link per user; referrals add bonus points
 - **Leaderboard** — Real-time ranking with Frame Score, regional breakdown, and Moni Smart Tier integration (🧠 emojis)
 - **Identity Card** — Personalized 1200×630px OG image generated per user (`/api/og`)
@@ -23,6 +23,7 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 | Database | Supabase PostgreSQL via Prisma ORM + `pg` pool |
 | OG Images | `@vercel/og` (Satori) with IBMPlexMono font |
 | Social Verification | Composio API → Twitter API v2 |
+| AI Oracle | **QVAC Local AI** (Qwen3-600M LLM via @qvac/sdk) |
 | Analytics & Scoring | Moni Discover API v3 |
 | Mobile | Solana Mobile Stack (MWA via Privy), PWA to APK ready |
 | Hosting | Vercel |
@@ -31,8 +32,8 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 
 ```bash
 cd waitlist
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -44,6 +45,7 @@ NEXT_PUBLIC_PRIVY_APP_ID=
 PRIVY_APP_SECRET=
 DATABASE_URL=
 DIRECT_URL=
+NEXT_PUBLIC_QVAC_URL=http://localhost:3001
 COMPOSIO_API_KEY=
 COMPOSIO_ENTITY_ID=
 COMPOSIO_CONNECTION_ID=
@@ -54,14 +56,16 @@ MONI_API_KEY=
 
 | File | Purpose |
 |------|---------|
+| `qvac-server.mjs` | **Local AI Inference Server** (handles tweet moderation) |
+| `app/api/qvac/verify/route.ts` | AI moderation proxy + tweet scraper |
 | `app/page.tsx` | Landing + waitlist entry (LandingContent) |
 | `app/dashboard/page.tsx` | User dashboard (BentoDashboard) |
 | `app/leaderboard/page.tsx` | Full leaderboard |
 | `app/api/og/route.tsx` | Identity Card OG image generation |
 | `lib/auth.ts` | Privy server-side session verification |
 | `lib/prisma.ts` | Prisma + pg.Pool adapter |
-| `lib/actions/user.ts` | Server actions: sync user, verify tasks, award points |
-| `components/BentoDashboard.tsx` | Main dashboard bento grid |
+| `lib/actions/user.ts` | Server actions: award points after AI verification |
+| `components/BentoDashboard.tsx` | Main dashboard with social task buttons |
 | `components/ShareImageModal.tsx` | Copy-to-clipboard + tweet share modal |
 
 ## Administration Utilities

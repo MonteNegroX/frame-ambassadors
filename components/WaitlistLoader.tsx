@@ -32,8 +32,8 @@ export function WaitlistLoader({ onComplete }: { onComplete: () => void }) {
             3: ["✔ X API connection stable.", "✔ Pre-scoring engine online."],
             4: ["✔ Connection established.", "✔ Indexing users..."],
           }}
-          typingSpeed={45}
-          delayBetweenCommands={800}
+          typingSpeed={30}
+          delayBetweenCommands={533}
           onComplete={onComplete}
           username="frame-os"
         />

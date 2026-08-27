@@ -160,9 +160,9 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-0 border border-dashed border-yellow-500/20 rounded-full"
                 />
-                <Zap className="h-6 w-6 text-yellow-500/40 animate-pulse" />
+                <Zap className="h-6 w-6 text-yellow-500/40" />
               </div>
-              <div className="text-[10px] font-mono tracking-[0.3em] uppercase opacity-40 animate-pulse">Initializing...</div>
+              <div className="text-[10px] font-mono tracking-[0.3em] uppercase opacity-40">Awaiting Data...</div>
             </div>
           ) : (
             <>
@@ -263,15 +263,7 @@ export function BentoDashboard({ dbUser, stats, onCopy, copying, onTask }: Bento
                 </div>
                 <span className="text-yellow-500">+100 XP</span>
               </div>
-              {(!dbUser?.frameScore || dbUser?.frameScore === 0) ? (
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-black/40 border border-white/5 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 cursor-not-allowed"
-                >
-                  <Lock className="h-3 w-3" />
-                  REQUIRES FRAME SCORE
-                </button>
-              ) : dbUser?.postedTweet ? (
+              {dbUser?.postedTweet ? (
                 <div className="w-full flex items-center justify-center gap-2 rounded-lg bg-white/5 border border-white/10 py-2.5 text-[9px] font-bold text-white/40 uppercase tracking-[0.2em]">
                   <CheckCircle2 className="h-3.5 w-3.5 text-green-500/50" />
                   TWEET VERIFIED
