@@ -127,12 +127,15 @@ export default function InfluencersPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-24" ref={topRef}>
+    <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pb-24" ref={topRef}>
+      {/* Ambient Gold Glow Background */}
+      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-yellow-500/10 blur-[130px] rounded-full z-0" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto space-y-6 pt-4"
+        className="relative z-10 max-w-7xl mx-auto space-y-6 pt-4"
       >
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
