@@ -9,7 +9,7 @@ import {
   useSpring,
   useTransform,
   type MotionValue,
-} from "motion/react";
+} from "framer-motion";
 import useMeasure from "react-use-measure";
 
 import { cn } from "@/lib/utils";

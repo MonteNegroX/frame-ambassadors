@@ -123,6 +123,12 @@ model KOLProfile {
   scoutScore              Int?        @map("scout_score")
   lastScoredAt            DateTime?   @map("last_scored_at")
 
+  // Marketplace Price Fields (optional; null = calculated via formula)
+  pricePromoTweet         Float?      @map("price_promo_tweet")
+  priceLikeRt             Float?      @map("price_like_rt")
+  priceFollow             Float?      @map("price_follow")
+  priceComment            Float?      @map("price_comment")
+
   createdAt               DateTime    @default(now()) @map("created_at")
   updatedAt               DateTime    @updatedAt @map("updated_at")
 

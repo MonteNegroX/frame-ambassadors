@@ -3,13 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Trophy } from "lucide-react";
+import { Home, LayoutDashboard, Trophy, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
+  { name: "KOLs", href: "/influencers", icon: Users },
   {
     name: "X",
     href: "https://x.com/frameonx",

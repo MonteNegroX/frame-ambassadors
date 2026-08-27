@@ -1,7 +1,7 @@
 # FRAME OS — Ambassador Waitlist
 
 **Live at:** [waitlist.frameonx.xyz](https://waitlist.frameonx.xyz)  
-**Status:** Production — 130+ ambassadors registered
+**Status:** Production — 1050+ ambassadors registered
 
 A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users authenticate via Twitter (Privy), complete social tasks to earn points, climb a leaderboard, and receive a shareable Identity Card (OG image).
 
@@ -10,7 +10,7 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 - **Privy Auth** — Twitter/X OAuth login with embedded Solana wallet creation
 - **Social Tasks** — Follow @frameonx, quote a target tweet → verified via Composio/Twitter API → points awarded
 - **Referral System** — Unique referral link per user; referrals add bonus points
-- **Leaderboard** — Real-time ranking with Frame Score, regional breakdown
+- **Leaderboard** — Real-time ranking with Frame Score, regional breakdown, and Moni Smart Tier integration (🧠 emojis)
 - **Identity Card** — Personalized 1200×630px OG image generated per user (`/api/og`)
 - **Share Modal** — Copy identity card to clipboard, share on X
 
@@ -23,14 +23,16 @@ A gamified ambassador waitlist for the FRAME OS / Ambassador Platform. Users aut
 | Database | Supabase PostgreSQL via Prisma ORM + `pg` pool |
 | OG Images | `@vercel/og` (Satori) with IBMPlexMono font |
 | Social Verification | Composio API → Twitter API v2 |
+| Analytics & Scoring | Moni Discover API v3 |
+| Mobile | Solana Mobile Stack (MWA via Privy), PWA to APK ready |
 | Hosting | Vercel |
 
 ## Local Development
 
 ```bash
 cd waitlist
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -45,6 +47,7 @@ DIRECT_URL=
 COMPOSIO_API_KEY=
 COMPOSIO_ENTITY_ID=
 COMPOSIO_CONNECTION_ID=
+MONI_API_KEY=
 ```
 
 ## Key Files
@@ -82,6 +85,13 @@ npx tsx scratch/manual-sync.ts did:privy:YOUR_USER_ID
 ```
 
 Fetches Twitter data from Privy and writes to the `users` table.
+
+### 3. Backup Database
+Create a JSON dump of all users:
+
+```bash
+npx tsx scratch/backup-db.ts
+```
 
 ## Design System
 

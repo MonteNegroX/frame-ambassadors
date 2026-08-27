@@ -51,7 +51,7 @@ async function main() {
       const ethos = user.ethosScore || 0;
       const refs = user._count.referrals;
       
-      console.log(`${(index + 1).toString().padEnd(4)} | @${handle.padEnd(15)} | ${sorsa.toString().padEnd(5)} | ${ethos.toString().padEnd(5)} | ${refs}`);
+      console.log(`${(index + 1).toString().padEnd(4)} | https://x.com/${handle.padEnd(15)} | ${sorsa.toString().padEnd(5)} | ${ethos.toString().padEnd(5)} | ${refs}`);
     });
 
     console.log("\n========================================");

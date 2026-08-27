@@ -119,6 +119,7 @@ export async function GET(request: Request) {
                   }}>
                     <img
                       src="https://pbs.twimg.com/profile_images/2013212275671224320/t8HXPK64_400x400.jpg"
+                      alt="FRAME OS"
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </div>
@@ -200,6 +201,7 @@ export async function GET(request: Request) {
                   {user?.ethosAvatarUrl ? (
                     <img
                       src={user.ethosAvatarUrl}
+                      alt={`${handle} avatar`}
                       style={{
                         width: '100%',
                         height: '100%',
