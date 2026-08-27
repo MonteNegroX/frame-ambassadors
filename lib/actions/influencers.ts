@@ -21,7 +21,7 @@ export interface InfluencerFilters {
  * Calculates estimated prices based on follower count and sorsa score
  * when no manual prices are stored in the DB.
  */
-export function calcEstimatedPrices(
+export async function calcEstimatedPrices(
   followers: number | null,
   sorsaScore: number | null
 ) {
