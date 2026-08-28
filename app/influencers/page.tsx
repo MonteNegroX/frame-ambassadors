@@ -16,6 +16,7 @@ const DEFAULT_FILTERS: FilterState = {
   minFollowers: "",
   maxFollowers: "",
   sortBy: "frameScore",
+  isPremium: false,
 };
 
 function SkeletonCard() {
@@ -56,7 +57,7 @@ export default function InfluencersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
-  const LIMIT = 24;
+  const LIMIT = 48;
 
   const buildQuery = useCallback(
     (f: FilterState, p: number) => {
