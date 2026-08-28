@@ -15,8 +15,7 @@ const DEFAULT_FILTERS: FilterState = {
   maxCs: "",
   minFollowers: "",
   maxFollowers: "",
-  sortBy: "sorsaScore",
-  isPremium: false,
+  sortBy: "frameScore",
 };
 
 function SkeletonCard() {

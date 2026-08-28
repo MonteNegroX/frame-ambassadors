@@ -80,6 +80,8 @@ model User {
   // Moni Smart Status
   moniSmartTier      Int?        @map("moni_smart_tier")
   moniSmartFollowers Int?        @map("moni_smart_followers")
+  followers          Int         @default(0)
+  moniScore          Int         @default(0) @map("moni_score")
 
   // Social Tasks
   followedTwitter Boolean     @default(false) @map("followed_twitter")

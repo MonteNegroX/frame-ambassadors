@@ -10,7 +10,7 @@ export interface FilterState {
   maxCs: string;
   minFollowers: string;
   maxFollowers: string;
-  sortBy: "sorsaScore" | "followers" | "points" | "createdAt";
+  sortBy: "frameScore" | "sorsaScore" | "followers" | "createdAt";
   isPremium: boolean;
 }
 
@@ -24,9 +24,9 @@ interface MarketplaceFiltersProps {
 }
 
 const SORT_OPTIONS = [
-  { value: "sorsaScore", label: "CS Score" },
+  { value: "frameScore", label: "Frame Score" },
+  { value: "sorsaScore", label: "Sorsa Score" },
   { value: "followers", label: "Followers" },
-  { value: "points", label: "XP Points" },
   { value: "createdAt", label: "Newest" },
 ] as const;
 
@@ -111,7 +111,7 @@ export function MarketplaceFilters({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* CS Range */}
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-mono">CS Score</label>
+              <label className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-mono">Sorsa Score</label>
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"

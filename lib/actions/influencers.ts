@@ -10,7 +10,7 @@ export interface InfluencerFilters {
   maxFollowers?: number;
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: "sorsaScore" | "followers" | "points" | "createdAt";
+  sortBy?: "frameScore" | "sorsaScore" | "followers" | "createdAt";
   sortDir?: "asc" | "desc";
   isPremium?: boolean; // moniSmartTier <= 3 and not null
   page?: number;
@@ -96,9 +96,10 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
       userWhere.moniSmartTier = { not: null, lte: 3 };
     }
 
-    // Follower filter — check moniSmartFollowers on User level or kolProfile
+    // Follower filter — check followers on User level, moniSmartFollowers or kolProfile
     if (minFollowers !== undefined && !isNaN(minFollowers) && minFollowers > 0) {
       userWhere.OR = [
+        { followers: { gte: minFollowers } },
         { moniSmartFollowers: { gte: minFollowers } },
         { kolProfile: { followerCount: { gte: minFollowers } } },
       ];
@@ -108,6 +109,7 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
         ...(userWhere.AND || []),
         {
           OR: [
+            { followers: { lte: maxFollowers } },
             { moniSmartFollowers: { lte: maxFollowers } },
             { kolProfile: { followerCount: { lte: maxFollowers } } },
           ],
@@ -115,14 +117,14 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
       ];
     }
 
-    // Build orderBy (use moniSmartFollowers for followers sort)
+    // Build orderBy (use followers for followers sort)
     const orderByMap: Record<string, any> = {
-      sorsaScore: [{ sorsaScore: sortDir }, { points: sortDir }],
-      points: { points: sortDir },
+      frameScore: [{ frameScore: { sort: sortDir, nulls: "last" } }, { points: sortDir }],
+      sorsaScore: [{ sorsaScore: { sort: sortDir, nulls: "last" } }, { points: sortDir }],
       createdAt: { createdAt: sortDir },
-      followers: [{ moniSmartFollowers: sortDir }, { points: sortDir }],
+      followers: [{ followers: { sort: sortDir, nulls: "last" } }, { moniSmartFollowers: { sort: sortDir, nulls: "last" } }, { points: sortDir }],
     };
-    const orderBy = orderByMap[sortBy] ?? [{ sorsaScore: "desc" }, { points: "desc" }];
+    const orderBy = orderByMap[sortBy] ?? [{ frameScore: { sort: "desc", nulls: "last" } }, { points: "desc" }];
 
     const [total, users] = await Promise.all([
       prisma.user.count({ where: userWhere }),
@@ -140,6 +142,7 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
           frameScore: true,
           moniSmartTier: true,
           moniSmartFollowers: true,
+          followers: true,
           points: true,
           waitlistRank: true,
           kolProfile: {
@@ -162,7 +165,7 @@ export async function getInfluencersAction(filters: InfluencerFilters = {}) {
     // Enrich with computed prices where manual prices are absent
     const influencers = users.map((u) => {
       const kol = u.kolProfile;
-      const followers = kol?.followerCount ?? u.moniSmartFollowers ?? null;
+      const followers = u.followers ?? kol?.followerCount ?? u.moniSmartFollowers ?? 0;
       const cs = u.sorsaScore ?? 0;
 
       const estimated = calcEstimatedPrices(followers, cs);
